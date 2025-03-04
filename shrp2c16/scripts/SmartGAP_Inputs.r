@@ -68,9 +68,9 @@
 
      # Load the estimated model
 	setwd( ScriptDir )
-	load( "SmartGAP_.RData" )
+	load( paste(ScriptDir,"SmartGAP_.RData", sep="/" ))
 	attach( GreenSTEP_ )
-     setwd( RunDir )
+    setwd( RunDir )
 
 #Load various files of parameters used in the model
 #==================================================

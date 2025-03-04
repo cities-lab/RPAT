@@ -37,11 +37,12 @@ library(data.table)
 # Command-line Parsing
 #===================================================
 option_list <- list(
-		make_option(c("-p", "--process"), help="Process to run")
+		make_option(c("-p", "--process"), help="Process to run"),
+		make_option(c("-s", "--scenario"), help="Name of scenario to run")
 )
 
 write_status <- function(status_name){
-    fileConn<-file("../../stdout.txt")
+    fileConn<-file(paste(RootDir, "stdout.txt", sep="/"))
     writeLines(c(status_name), fileConn)
     close(fileConn)
 }
@@ -61,18 +62,20 @@ opt <- parse_args(OptionParser(option_list=option_list))
 	Dir_ <- list()
 
 	# Directory references are made with respect to the run directory
-	Dir_$RunDir <- getwd()
+	Dir_$RunDir <- paste(getwd(), "projects/project", opt$scenario, sep="/")
 
 	# The inputs directory is in the directory where the scenario is run
-	Dir_$InputDir <- "inputs"
+	Dir_$InputDir <- paste(Dir_$RunDir, "inputs", sep="/")
 	
 	# Make directories for the outputs
-	if( !file.exists("outputs") ) dir.create( "outputs" )
-	Dir_$OutputDir <- "outputs"
+	Dir_$OutputDir <- paste(Dir_$RunDir, "outputs", sep="/")
+	if( !file.exists(Dir_$OutputDir) ) dir.create( Dir_$OutputDir )
+	
 	
 	# Directories containing parameters and run scripts are common for all scenarios in the project
-	Dir_$ParameterDir <- "parameters"
-	Dir_$ScriptDir <- "../../../scripts"
+	Dir_$ParameterDir <- paste(Dir_$RunDir, "parameters", sep="/")
+	Dir_$ScriptDir <- paste(getwd(), "scripts", sep="/")
+	Dir_$RootDir <- getwd()
 	attach( Dir_ )
 	
 #Define function to load an RData object to an object name
@@ -89,9 +92,10 @@ opt <- parse_args(OptionParser(option_list=option_list))
 	 #scenario inputs are either in inputs or if not should be in base/inputs
 	 inputLocation <- function(filename){
 		 if( file.exists( paste( InputDir,filename,sep="/" ))) {
-			inputLocation <- paste( InputDir,filename,sep="/" )			 
+			inputLocation <- paste( InputDir,filename,sep="/" )	 
 		 } else {
-			inputLocation <- paste( "../base",InputDir,filename,sep="/" ) 
+			stop(paste("Input file",filename,"not found in",InputDir))
+			#inputLocation <- paste( "Base",InputDir,filename,sep="/" )
 		 } 
 	 }
 	
@@ -106,14 +110,14 @@ opt <- parse_args(OptionParser(option_list=option_list))
 
 #The SmartGAP_Inputs.r script loads all of the data objects needed to run the model.
 
-	source( paste( ScriptDir, "/SmartGAP_Inputs.r", sep="" ) )
+	source( paste( ScriptDir, "SmartGAP_Inputs.r", sep="/" ) )
 	
 #Run the SmartGAP_Sim.r script
 #==============================
 
 #The SmartGAP_Sim.r module contains a set of functions that perform all of the household microsimulation calculations for determining household income, vehicle ownership, household travel and vehicle characteristics and use. 
 
-	source( paste( ScriptDir, "/SmartGAP_Sim.r", sep="" ) )
+	source( paste( ScriptDir, "SmartGAP_Sim.r", sep="/" ) )
 
 #Set up and execute either a single run step or the whole model
 #==============================================================

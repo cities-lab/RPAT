@@ -46,16 +46,17 @@ library(scales)
 	Dir_ <- list()
 
 	# Directory references are made with respect to the run directory
-	Dir_$RunDir <- getwd()
+	Dir_$RunDir <- paste(getwd(), "projects/project/Base",  sep="/")
 
 	# The inputs directory is in the directory where the scenario is run
 	Dir_$InputDir <- "inputs"
 	Dir_$OutputDir <- "outputs"
 	
 	# Directories containing parameters and run scripts are common for all scenarios in the project
-	Dir_$ParameterDir <- "../parameters"
-	Dir_$ScriptDir <- "../../../scripts"
-	Dir_$ReportsDir <- "../reports"
+	Dir_$ParameterDir <- "parameters"
+	Dir_$ScriptDir <- "scripts"
+	Dir_$ReportsDir <- paste(Dir_$RunDir, "..", "reports", sep="/")
+	Dir_$RootDir <- getwd()
 	attach( Dir_ )
 	
 #Define function to load an RData object to an object name
@@ -74,7 +75,9 @@ library(scales)
 		 if( file.exists( paste( InputDir,filename,sep="/" ))) {
 			inputLocation <- paste( InputDir,filename,sep="/" )			 
 		 } else {
-			inputLocation <- paste( "../base",InputDir,filename,sep="/" ) 
+			stop(paste("Input file",filename,"not found in",InputDir))
+			#inputLoc <- gsub(opt$scenarios, 'Base', InputDir, perl = TRUE)
+			#inputLocation <- paste( inputLoc,filename,sep="/" )
 		 } 
 	 }
 	
@@ -137,7 +140,7 @@ makeChart <- function(scenarios, metric, aggregation, measure){
 		load(filename)
 		get(ls()[ls() != "filename"])
 	}
-	
+
 	#importing and formatting the data varies by the five output categories (Pt, MaTy, As, Ig,Ma )
 	if(Metrics$category[Metrics$metric == metric] == "Pt"){
 		#get the files specified by the user inputs
@@ -149,9 +152,14 @@ makeChart <- function(scenarios, metric, aggregation, measure){
 		#read in the scenario files one by one and add to chartdata
 		#don't assume that they are sorrted correctly - merge on place
 		for(scenario in scenarios){
-		  scenarioOutputDir <- paste("..", scenario, OutputDir, sep="/")
+		  scenarioOutputDir <- paste(RunDir, "..", scenario, OutputDir, sep="/")
 			temp <- assignLoad(paste(paste(scenarioOutputDir,metric,sep="/"),".Pt.RData",sep=""))
-			temp <- data.frame(place = names(temp),temp)
+			if ("table" %in% class(temp)) {
+				temp_val <- as.numeric(temp)
+			} else {
+				temp_val <- temp
+			}
+			temp <- data.frame(place = names(temp),temp_val)
 			names(temp)[2] <- scenario
 			chartdata <- merge(chartdata,temp,by="place") 
 		}
@@ -163,7 +171,7 @@ makeChart <- function(scenarios, metric, aggregation, measure){
 		#read in the scenario files one by one and add to chartdata
 		#don't assume that they are sorrted correctly - merge on vehtype
 		for(scenario in scenarios){
-		  scenarioOutputDir <- paste("..", scenario, OutputDir, sep="/")
+		  scenarioOutputDir <- paste(RunDir, "..", scenario, OutputDir, sep="/")
 			temp <- assignLoad(paste(paste(scenarioOutputDir,metric,sep="/"),".MaTy.RData",sep=""))
 			temp <- data.frame(vehtype = colnames(temp),temp[1,])
 			names(temp)[2] <- scenario
@@ -177,7 +185,7 @@ makeChart <- function(scenarios, metric, aggregation, measure){
 		#read in the scenario files one by one and add to chartdata
 		#don't assume that they are sorrted correctly - merge on incgrp
 		for(scenario in scenarios){
-		  scenarioOutputDir <- paste("..", scenario, OutputDir, sep="/")
+		  scenarioOutputDir <- paste(RunDir, "..", scenario, OutputDir, sep="/")
 			temp <- assignLoad(paste(paste(scenarioOutputDir,metric,sep="/"),".Ig.RData",sep=""))
 			temp <- data.frame(incgrp = names(temp),temp)
 			names(temp)[2] <- scenario
@@ -191,7 +199,7 @@ makeChart <- function(scenarios, metric, aggregation, measure){
 		#read in the scenario files one by one and add to chartdata
 		#don't assume that they are sorrted correctly - merge on accsev
 		for(scenario in scenarios){
-		  scenarioOutputDir <- paste("..", scenario, OutputDir, sep="/")
+		  scenarioOutputDir <- paste(RunDir, "..", scenario, OutputDir, sep="/")
 			temp <- assignLoad(paste(paste(scenarioOutputDir,metric,sep="/"),".As.RData",sep=""))
 			temp <- data.frame(accsev = rownames(temp),temp[,1])
 			names(temp)[2] <- scenario
@@ -204,7 +212,7 @@ makeChart <- function(scenarios, metric, aggregation, measure){
 		chartdata <- data.frame(variable = scenarios, value = NA)
 		#read in the scenario files one by one and add to chartdata
 		for(scenario in scenarios){
-		  scenarioOutputDir <- paste("..", scenario, OutputDir, sep="/")
+		  scenarioOutputDir <- paste(RunDir, "..", scenario, OutputDir, sep="/")
 			temp <- assignLoad(paste(paste(scenarioOutputDir,metric,sep="/"),".Ma.RData",sep=""))
 			chartdata$value[chartdata$variable == scenario] <- temp 
 		}

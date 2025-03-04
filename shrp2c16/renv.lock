@@ -1,0 +1,571 @@
+{
+  "R": {
+    "Version": "4.4.3",
+    "Repositories": [
+      {
+        "Name": "CRAN",
+        "URL": "https://cloud.r-project.org"
+      }
+    ]
+  },
+  "Packages": {
+    "MASS": {
+      "Package": "MASS",
+      "Version": "7.3-64",
+      "Source": "Repository",
+      "Priority": "recommended",
+      "Date": "2025-01-06",
+      "Revision": "$Rev: 3680 $",
+      "Depends": [
+        "R (>= 4.4.0)",
+        "grDevices",
+        "graphics",
+        "stats",
+        "utils"
+      ],
+      "Imports": [
+        "methods"
+      ],
+      "Suggests": [
+        "lattice",
+        "nlme",
+        "nnet",
+        "survival"
+      ],
+      "Authors@R": "c(person(\"Brian\", \"Ripley\", role = c(\"aut\", \"cre\", \"cph\"), email = \"Brian.Ripley@R-project.org\"), person(\"Bill\", \"Venables\", role = c(\"aut\", \"cph\")), person(c(\"Douglas\", \"M.\"), \"Bates\", role = \"ctb\"), person(\"Kurt\", \"Hornik\", role = \"trl\", comment = \"partial port ca 1998\"), person(\"Albrecht\", \"Gebhardt\", role = \"trl\", comment = \"partial port ca 1998\"), person(\"David\", \"Firth\", role = \"ctb\", comment = \"support functions for polr\"))",
+      "Description": "Functions and datasets to support Venables and Ripley, \"Modern Applied Statistics with S\" (4th edition, 2002).",
+      "Title": "Support Functions and Datasets for Venables and Ripley's MASS",
+      "LazyData": "yes",
+      "ByteCompile": "yes",
+      "License": "GPL-2 | GPL-3",
+      "URL": "http://www.stats.ox.ac.uk/pub/MASS4/",
+      "Contact": "<MASS@stats.ox.ac.uk>",
+      "NeedsCompilation": "yes",
+      "Author": "Brian Ripley [aut, cre, cph], Bill Venables [aut, cph], Douglas M. Bates [ctb], Kurt Hornik [trl] (partial port ca 1998), Albrecht Gebhardt [trl] (partial port ca 1998), David Firth [ctb] (support functions for polr)",
+      "Maintainer": "Brian Ripley <Brian.Ripley@R-project.org>",
+      "Repository": "CRAN"
+    },
+    "RColorBrewer": {
+      "Package": "RColorBrewer",
+      "Version": "1.1-2",
+      "Source": "Repository",
+      "Date": "2014-12-07",
+      "Title": "ColorBrewer Palettes",
+      "Authors@R": "c(person(given = \"Erich\", family = \"Neuwirth\", role = c(\"aut\", \"cre\"), email = \"erich.neuwirth@univie.ac.at\"))",
+      "Author": "Erich Neuwirth [aut, cre]",
+      "Maintainer": "Erich Neuwirth <erich.neuwirth@univie.ac.at>",
+      "Depends": [
+        "R (>= 2.0.0)"
+      ],
+      "Description": "Provides color schemes for maps (and other graphics) designed by Cynthia Brewer as described at http://colorbrewer2.org",
+      "License": "Apache License 2.0",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "Rcpp": {
+      "Package": "Rcpp",
+      "Version": "1.0.13-1",
+      "Source": "Repository",
+      "Title": "Seamless R and C++ Integration",
+      "Date": "2024-11-01",
+      "Authors@R": "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\", comment = c(ORCID = \"0000-0001-6419-907X\")), person(\"Romain\", \"Francois\", role = \"aut\", comment = c(ORCID = \"0000-0002-2444-4226\")), person(\"JJ\", \"Allaire\", role = \"aut\", comment = c(ORCID = \"0000-0003-0174-9868\")), person(\"Kevin\", \"Ushey\", role = \"aut\", comment = c(ORCID = \"0000-0003-2880-7407\")), person(\"Qiang\", \"Kou\", role = \"aut\", comment = c(ORCID = \"0000-0001-6786-5453\")), person(\"Nathan\", \"Russell\", role = \"aut\"), person(\"Iñaki\", \"Ucar\", role = \"aut\", comment = c(ORCID = \"0000-0001-6403-5550\")), person(\"Doug\", \"Bates\", role = \"aut\", comment = c(ORCID = \"0000-0001-8316-9503\")), person(\"John\", \"Chambers\", role = \"aut\"))",
+      "Description": "The 'Rcpp' package provides R functions as well as C++ classes which offer a seamless integration of R and C++. Many R data types and objects can be mapped back and forth to C++ equivalents which facilitates both writing of new code as well as easier integration of third-party libraries. Documentation about 'Rcpp' is provided by several vignettes included in this package, via the 'Rcpp Gallery' site at <https://gallery.rcpp.org>, the paper by Eddelbuettel and Francois (2011, <doi:10.18637/jss.v040.i08>), the book by Eddelbuettel (2013, <doi:10.1007/978-1-4614-6868-4>) and the paper by Eddelbuettel and Balamuta (2018, <doi:10.1080/00031305.2017.1375990>); see 'citation(\"Rcpp\")' for details.",
+      "Imports": [
+        "methods",
+        "utils"
+      ],
+      "Suggests": [
+        "tinytest",
+        "inline",
+        "rbenchmark",
+        "pkgKitten (>= 0.1.2)"
+      ],
+      "URL": "https://www.rcpp.org, https://dirk.eddelbuettel.com/code/rcpp.html, https://github.com/RcppCore/Rcpp",
+      "License": "GPL (>= 2)",
+      "BugReports": "https://github.com/RcppCore/Rcpp/issues",
+      "MailingList": "rcpp-devel@lists.r-forge.r-project.org",
+      "RoxygenNote": "6.1.1",
+      "Encoding": "UTF-8",
+      "NeedsCompilation": "yes",
+      "Author": "Dirk Eddelbuettel [aut, cre] (<https://orcid.org/0000-0001-6419-907X>), Romain Francois [aut] (<https://orcid.org/0000-0002-2444-4226>), JJ Allaire [aut] (<https://orcid.org/0000-0003-0174-9868>), Kevin Ushey [aut] (<https://orcid.org/0000-0003-2880-7407>), Qiang Kou [aut] (<https://orcid.org/0000-0001-6786-5453>), Nathan Russell [aut], Iñaki Ucar [aut] (<https://orcid.org/0000-0001-6403-5550>), Doug Bates [aut] (<https://orcid.org/0000-0001-8316-9503>), John Chambers [aut]",
+      "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
+      "Repository": "CRAN"
+    },
+    "colorspace": {
+      "Package": "colorspace",
+      "Version": "1.2-6",
+      "Source": "Repository",
+      "Date": "2015-03-10",
+      "Title": "Color Space Manipulation",
+      "Authors@R": "c(person(given = \"Ross\", family = \"Ihaka\", role = \"aut\", email = \"ihaka@stat.auckland.ac.nz\"), person(given = \"Paul\", family = \"Murrell\", role = \"aut\", email = \"paul@stat.auckland.ac.nz\"), person(given = \"Kurt\", family = \"Hornik\", role = \"aut\", email = \"Kurt.Hornik@R-project.org\"), person(given = c(\"Jason\", \"C.\"), family = \"Fisher\", role = \"aut\", email = \"jfisher@usgs.gov\"), person(given = \"Achim\", family = \"Zeileis\", role = c(\"aut\", \"cre\"), email = \"Achim.Zeileis@R-project.org\"))",
+      "Description": "Carries out mapping between assorted color spaces including RGB, HSV, HLS, CIEXYZ, CIELUV, HCL (polar CIELUV), CIELAB and polar CIELAB. Qualitative, sequential, and diverging color palettes based on HCL colors are provided.",
+      "Depends": [
+        "R (>= 2.13.0)",
+        "methods"
+      ],
+      "Imports": [
+        "graphics"
+      ],
+      "Suggests": [
+        "KernSmooth",
+        "MASS",
+        "kernlab",
+        "mvtnorm",
+        "vcd",
+        "dichromat",
+        "tcltk"
+      ],
+      "License": "BSD_3_clause + file LICENSE",
+      "LazyData": "yes",
+      "Author": "Ross Ihaka [aut], Paul Murrell [aut], Kurt Hornik [aut], Jason C. Fisher [aut], Achim Zeileis [aut, cre]",
+      "Maintainer": "Achim Zeileis <Achim.Zeileis@R-project.org>",
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN"
+    },
+    "data.table": {
+      "Package": "data.table",
+      "Version": "1.10.4",
+      "Source": "Repository",
+      "Title": "Extension of `data.frame`",
+      "Authors@R": "c( person(\"Matt\",\"Dowle\",      role=c(\"aut\",\"cre\"), email=\"mattjdowle@gmail.com\"), person(\"Arun\",\"Srinivasan\", role=\"aut\", email=\"arunkumar.sriniv@gmail.com\"), person(\"Jan\",\"Gorecki\",     role=\"ctb\"), person(\"Tom\",\"Short\",       role=\"ctb\"), person(\"Steve\",\"Lianoglou\", role=\"ctb\"), person(\"Eduard\",\"Antonyan\", role=\"ctb\") )",
+      "Depends": [
+        "R (>= 3.0.0)"
+      ],
+      "Imports": [
+        "methods"
+      ],
+      "Suggests": [
+        "bit64",
+        "knitr",
+        "nanotime",
+        "chron",
+        "ggplot2 (>= 0.9.0)",
+        "plyr",
+        "reshape",
+        "reshape2",
+        "testthat (>= 0.4)",
+        "hexbin",
+        "fastmatch",
+        "nlme",
+        "xts",
+        "gdata",
+        "GenomicRanges",
+        "caret",
+        "curl",
+        "zoo",
+        "plm",
+        "rmarkdown",
+        "parallel"
+      ],
+      "Description": "Fast aggregation of large data (e.g. 100GB in RAM), fast ordered joins, fast add/modify/delete of columns by group using no copies at all, list columns, a fast friendly file reader and parallel file writer. Offers a natural and flexible syntax, for faster development.",
+      "License": "GPL-3 | file LICENSE",
+      "URL": "http://r-datatable.com",
+      "BugReports": "https://github.com/Rdatatable/data.table/issues",
+      "MailingList": "datatable-help@lists.r-forge.r-project.org",
+      "VignetteBuilder": "knitr",
+      "ByteCompile": "TRUE",
+      "NeedsCompilation": "yes",
+      "Author": "Matt Dowle [aut, cre], Arun Srinivasan [aut], Jan Gorecki [ctb], Tom Short [ctb], Steve Lianoglou [ctb], Eduard Antonyan [ctb]",
+      "Maintainer": "Matt Dowle <mattjdowle@gmail.com>",
+      "Repository": "CRAN"
+    },
+    "dichromat": {
+      "Package": "dichromat",
+      "Version": "2.0-0",
+      "Source": "Repository",
+      "Date": "2013-01-23",
+      "Title": "Color Schemes for Dichromats",
+      "Authors@R": "c(person(given = \"Thomas\", family = \"Lumley\", role = c(\"aut\", \"cre\"), email = \"tlumley@u.washington.edu\"), person(given = \"Ken\", family = \"Knoblauch\", role = \"ctb\", email = \"ken.knoblauch@inserm.fr\"), person(given = \"Scott\", family = \"Waichler\", role = \"ctb\", email = \"scott.waichler@pnl.gov\"), person(given = \"Achim\", family = \"Zeileis\", role = \"ctb\", email = \"Achim.Zeileis@R-project.org\"))",
+      "Description": "Collapse red-green or green-blue distinctions to simulate the effects of different types of color-blindness.",
+      "Depends": [
+        "R (>= 2.10)",
+        "stats"
+      ],
+      "License": "GPL-2",
+      "LazyLoad": "Yes",
+      "Author": "Thomas Lumley [aut, cre], Ken Knoblauch [ctb], Scott Waichler [ctb], Achim Zeileis [ctb]",
+      "Maintainer": "Thomas Lumley <tlumley@u.washington.edu>",
+      "Repository": "CRAN"
+    },
+    "digest": {
+      "Package": "digest",
+      "Version": "0.6.8",
+      "Source": "Repository",
+      "Date": "2013-12-30",
+      "Author": "Dirk Eddelbuettel <edd@debian.org> with contributions  by Antoine Lucas, Jarek Tuszynski, Henrik Bengtsson, Simon Urbanek, Mario Frasca, Bryan Lewis, Murray Stokely, Hannes Muehleisen, Duncan Murdoch, Jim Hester and Wush Wu.",
+      "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
+      "Title": "Create Cryptographic Hash Digests of R Objects",
+      "Description": "Implementation of a function 'digest()' for the creation  of hash digests of arbitrary R objects (using the md5, sha-1, sha-256,  crc32, xxhash and murmurhash algorithms) permitting easy comparison of R language objects, as well as a function 'hmac()' to create hash-based message authentication code. . The md5 algorithm by Ron Rivest is specified in RFC 1321, the sha-1  and sha-256 algorithms are specified in FIPS-180-1 and FIPS-180-2,  and the crc32 algorithm is described in  ftp://ftp.rocksoft.com/cliens/rocksoft/papers/crc_v3.txt. . For md5, sha-1, sha-256 and aes, this package uses small standalone implementations that were provided by Christophe Devine. For crc32, code from the zlib library is used. For sha-512, an implementation by Aaron D. Gifford is used. For xxHash, the implementation by Yann Collet is used. For murmurhash, an implementation by Shane Day is used. . Please note that this package is not meant to be deployed for  cryptographic purposes for which more comprehensive (and widely  tested) libraries such as OpenSSL should be used.",
+      "Depends": [
+        "R (>= 2.4.1)"
+      ],
+      "License": "GPL-2",
+      "URL": "http://dirk.eddelbuettel.com/code/digest.html",
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN"
+    },
+    "getopt": {
+      "Package": "getopt",
+      "Version": "1.20.0",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "C-like getopt behavior.",
+      "Author": "Allen Day. Contributions from Trevor L Davis.",
+      "Maintainer": "Trevor L Davis <trevor.l.davis@stanford.edu>",
+      "URL": "https://github.com/trevorld/getopt",
+      "BugReports": "https://github.com/trevorld/getopt/issues",
+      "Description": "Package designed to be used with Rscript to write ``#!'' shebang scripts that accept short and long flags/options. Many users will prefer using instead the packages optparse or argparse which add extra features like automatically generated help option and usage, support for default values, positional argument support, etc.",
+      "License": "GPL (>= 2)",
+      "Suggests": [
+        "testthat"
+      ],
+      "Collate": "'getopt.R' 'utils.R'",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "ggplot2": {
+      "Package": "ggplot2",
+      "Version": "1.0.1",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "An Implementation of the Grammar of Graphics",
+      "Authors@R": "c( person(\"Hadley\", \"Wickham\", role = c(\"aut\", \"cre\"), email = \"h.wickham@gmail.com\"), person(\"Winston\", \"Chang\", role = \"aut\", email = \"winston@stdout.org\") )",
+      "Description": "An implementation of the grammar of graphics in R. It combines the advantages of both base and lattice graphics: conditioning and shared axes are handled automatically, and you can still build up a plot step by step from multiple data sources. It also implements a sophisticated multidimensional conditioning system and a consistent interface to map data to aesthetic attributes. See http://ggplot2.org for more information, documentation and examples.",
+      "Depends": [
+        "R (>= 2.14)",
+        "stats",
+        "methods"
+      ],
+      "Imports": [
+        "plyr (>= 1.7.1)",
+        "digest",
+        "grid",
+        "gtable (>= 0.1.1)",
+        "reshape2",
+        "scales (>= 0.2.3)",
+        "proto",
+        "MASS"
+      ],
+      "Suggests": [
+        "quantreg",
+        "Hmisc",
+        "mapproj",
+        "maps",
+        "hexbin",
+        "maptools",
+        "multcomp",
+        "nlme",
+        "testthat",
+        "knitr",
+        "mgcv"
+      ],
+      "VignetteBuilder": "knitr",
+      "Enhances": [
+        "sp"
+      ],
+      "License": "GPL-2",
+      "URL": "http://ggplot2.org, https://github.com/hadley/ggplot2",
+      "BugReports": "https://github.com/hadley/ggplot2/issues",
+      "LazyData": "true",
+      "Collate": "'aaa-.r' 'aaa-constants.r' 'aes-calculated.r' 'aes-colour-fill-alpha.r' 'aes-group-order.r' 'aes-linetype-size-shape.r' 'aes-position.r' 'aes.r' 'geom-.r' 'annotation-custom.r' 'annotation-logticks.r' 'geom-polygon.r' 'geom-map.r' 'annotation-map.r' 'geom-raster.r' 'annotation-raster.r' 'annotation.r' 'autoplot.r' 'bench.r' 'coord-.r' 'coord-cartesian-.r' 'coord-fixed.r' 'coord-flip.r' 'coord-map.r' 'coord-munch.r' 'coord-polar.r' 'coord-quickmap.R' 'coord-transform.r' 'facet-.r' 'facet-grid-.r' 'facet-labels.r' 'facet-layout.r' 'facet-locate.r' 'facet-null.r' 'facet-viewports.r' 'facet-wrap.r' 'fortify-lm.r' 'fortify-map.r' 'fortify-multcomp.r' 'fortify-spatial.r' 'fortify.r' 'geom-abline.r' 'geom-bar-.r' 'geom-bar-histogram.r' 'geom-bin2d.r' 'geom-blank.r' 'geom-boxplot.r' 'geom-crossbar.r' 'geom-defaults.r' 'geom-dotplot.r' 'geom-error.r' 'geom-errorh.r' 'geom-freqpoly.r' 'geom-hex.r' 'geom-hline.r' 'geom-linerange.r' 'geom-path-.r' 'geom-path-contour.r' 'geom-path-density2d.r' 'geom-path-line.r' 'geom-path-step.r' 'geom-point-.r' 'geom-point-jitter.r' 'geom-pointrange.r' 'geom-quantile.r' 'geom-rect.r' 'geom-ribbon-.r' 'geom-ribbon-density.r' 'geom-rug.r' 'geom-segment.r' 'geom-smooth.r' 'geom-text.r' 'geom-tile.r' 'geom-violin.r' 'geom-vline.r' 'ggplot2.r' 'grob-absolute.r' 'grob-dotstack.r' 'grob-null.r' 'guide-colorbar.r' 'guide-legend.r' 'guides-.r' 'guides-axis.r' 'guides-grid.r' 'labels.r' 'layer.r' 'limits.r' 'panel.r' 'plot-build.r' 'plot-construction.r' 'plot-last.r' 'plot-render.r' 'plot.r' 'position-.r' 'position-collide.r' 'position-dodge.r' 'position-fill.r' 'position-identity.r' 'position-jitter.r' 'position-jitterdodge.R' 'position-stack.r' 'quick-plot.r' 'save.r' 'scale-.r' 'scale-alpha.r' 'scale-area.r' 'scale-brewer.r' 'scale-continuous.r' 'scale-date.r' 'scale-datetime.r' 'scale-discrete-.r' 'scale-gradient.r' 'scale-gradient2.r' 'scale-gradientn.r' 'scale-grey.r' 'scale-hue.r' 'scale-identity.r' 'scale-linetype.r' 'scale-manual.r' 'scale-shape.r' 'scale-size.r' 'scales-.r' 'stat-.r' 'stat-bin.r' 'stat-bin2d.r' 'stat-bindot.r' 'stat-binhex.r' 'stat-boxplot.r' 'stat-contour.r' 'stat-density-2d.r' 'stat-density.r' 'stat-ecdf.r' 'stat-ellipse.R' 'stat-function.r' 'stat-identity.r' 'stat-qq.r' 'stat-quantile.r' 'stat-smooth-methods.r' 'stat-smooth.r' 'stat-spoke.r' 'stat-sum.r' 'stat-summary-2d.r' 'stat-summary-hex.r' 'stat-summary.r' 'stat-unique.r' 'stat-vline.r' 'stat-ydensity.r' 'summary.r' 'templates.r' 'theme-defaults.r' 'theme-elements.r' 'theme.r' 'translate-qplot-base.r' 'translate-qplot-ggplot.r' 'translate-qplot-gpl.r' 'translate-qplot-lattice.r' 'utilities-break.r' 'utilities-grid.r' 'utilities-help.r' 'utilities-layer.r' 'utilities-matrix.r' 'utilities-resolution.r' 'utilities-table.r' 'utilities.r' 'xxx-digest.r' 'zxx.r' 'zzz.r'",
+      "Author": "Hadley Wickham [aut, cre], Winston Chang [aut]",
+      "Maintainer": "Hadley Wickham <h.wickham@gmail.com>",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "gtable": {
+      "Package": "gtable",
+      "Version": "0.1.2",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Arrange grobs in tables.",
+      "Author": "Hadley Wickham <h.wickham@gmail.com>",
+      "Maintainer": "Hadley Wickham <h.wickham@gmail.com>",
+      "Description": "Tools to make it easier to work with \"tables\" of grobs.",
+      "Depends": [
+        "R (>= 2.14)",
+        "grid"
+      ],
+      "Suggests": [
+        "testthat",
+        "plyr"
+      ],
+      "License": "GPL-2",
+      "Collate": "'add-grob.r' 'add-rows-cols.r' 'add-space.r' 'grid.r' 'gtable-layouts.r' 'gtable.r' 'rbind-cbind.r' 'utils.r' 'trim.r' 'filter.r' 'align.r' 'padding.r' 'z.r'",
+      "Repository": "CRAN"
+    },
+    "labeling": {
+      "Package": "labeling",
+      "Version": "0.3",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Axis Labeling",
+      "Date": "2014-08-22",
+      "Author": "Justin Talbot",
+      "Maintainer": "Justin Talbot <justintalbot@gmail.com>",
+      "Description": "Provides a range of axis labeling algorithms",
+      "License": "MIT + file LICENSE | Unlimited",
+      "LazyLoad": "no",
+      "Collate": "'labeling.R'",
+      "Repository": "CRAN",
+      "Repository/R-Forge/Project": "labeling",
+      "Repository/R-Forge/Revision": "16",
+      "Repository/R-Forge/DateTimeStamp": "2014-08-23 05:53:23",
+      "NeedsCompilation": "no"
+    },
+    "munsell": {
+      "Package": "munsell",
+      "Version": "0.4.2",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Munsell colour system",
+      "Author": "Charlotte Wickham <cwickham@gmail.com>",
+      "Maintainer": "Charlotte Wickham <cwickham@gmail.com>",
+      "Description": "Functions for exploring and using the Munsell colour system",
+      "Suggests": [
+        "ggplot2 (>= 0.9.2)"
+      ],
+      "Imports": [
+        "colorspace"
+      ],
+      "License": "MIT + file LICENSE",
+      "Collate": "'alter.r' 'check.r' 'convert.r' 'munsell.r' 'plot.r'",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "optparse": {
+      "Package": "optparse",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Encoding": "UTF-8",
+      "Type": "Package",
+      "Title": "Command line option parser.",
+      "Author": "Trevor L Davis. Some documentation and examples ported from Allen Day's getopt package. Some documentation from the optparse Python module by the Python Software Foundation. Contributions from Steve Lianoglou, Jim Nikelski, Kirill Müller, and Peter Humburg.",
+      "Maintainer": "Trevor L Davis <trevor.l.davis@stanford.edu>",
+      "Description": "A command line parser inspired by Python's 'optparse' library to be used with Rscript to write \"#!\" shebang scripts that accept short and long flag/options.",
+      "License": "GPL (>= 2)",
+      "Copyright": "See file (inst/)COPYRIGHTS.",
+      "URL": "https://github.com/trevorld/optparse",
+      "BugReports": "https://github.com/trevorld/optparse/issues",
+      "LazyLoad": "yes",
+      "Depends": [
+        "R (>= 2.9.0)"
+      ],
+      "Imports": [
+        "methods",
+        "getopt (>= 1.19)"
+      ],
+      "Suggests": [
+        "knitr",
+        "stringr",
+        "testthat"
+      ],
+      "VignetteBuilder": "knitr",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "plyr": {
+      "Package": "plyr",
+      "Version": "1.8.1",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Tools for splitting, applying and combining data",
+      "Author": "Hadley Wickham <h.wickham@gmail.com>",
+      "Maintainer": "Hadley Wickham <h.wickham@gmail.com>",
+      "Description": "plyr is a set of tools that solves a common set of problems: you need to break a big problem down into manageable pieces, operate on each pieces and then put all the pieces back together.  For example, you might want to fit a model to each spatial location or time point in your study, summarise data by panels or collapse high-dimensional arrays to simpler summary statistics. The development of plyr has been generously supported by BD (Becton Dickinson).",
+      "URL": "http://had.co.nz/plyr",
+      "Depends": [
+        "R (>= 2.11.0)"
+      ],
+      "Imports": [
+        "Rcpp (>= 0.11.0)"
+      ],
+      "LinkingTo": [
+        "Rcpp"
+      ],
+      "Suggests": [
+        "abind",
+        "testthat",
+        "tcltk",
+        "foreach",
+        "doMC",
+        "itertools",
+        "iterators"
+      ],
+      "License": "MIT + file LICENSE",
+      "LazyData": "true",
+      "Roxygen": "list(wrap = FALSE)",
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN"
+    },
+    "proto": {
+      "Package": "proto",
+      "Version": "0.3-10",
+      "Source": "Repository",
+      "Date": "2012-12-21",
+      "Title": "Prototype object-based programming",
+      "Author": "Louis Kates, Thomas Petzoldt",
+      "Maintainer": "Gabor Grothendieck <ggrothendieck@gmail.com>",
+      "Description": "An object oriented system using object-based, also called prototype-based, rather than class-based object oriented ideas.",
+      "Suggests": [
+        "graph",
+        "Rgraphviz"
+      ],
+      "License": "GPL-2",
+      "URL": "http://r-proto.googlecode.com",
+      "Repository": "CRAN"
+    },
+    "renv": {
+      "Package": "renv",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Project Environments",
+      "Authors@R": "c( person(\"Kevin\", \"Ushey\", role = c(\"aut\", \"cre\"), email = \"kevin@rstudio.com\", comment = c(ORCID = \"0000-0003-2880-7407\")), person(\"Hadley\", \"Wickham\", role = c(\"aut\"), email = \"hadley@rstudio.com\", comment = c(ORCID = \"0000-0003-4757-117X\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )",
+      "Description": "A dependency management toolkit for R. Using 'renv', you can create and manage project-local R libraries, save the state of these libraries to a 'lockfile', and later restore your library as required. Together, these tools can help make your projects more isolated, portable, and reproducible.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://rstudio.github.io/renv/, https://github.com/rstudio/renv",
+      "BugReports": "https://github.com/rstudio/renv/issues",
+      "Imports": [
+        "utils"
+      ],
+      "Suggests": [
+        "BiocManager",
+        "cli",
+        "compiler",
+        "covr",
+        "cpp11",
+        "devtools",
+        "gitcreds",
+        "jsonlite",
+        "jsonvalidate",
+        "knitr",
+        "miniUI",
+        "modules",
+        "packrat",
+        "pak",
+        "R6",
+        "remotes",
+        "reticulate",
+        "rmarkdown",
+        "rstudioapi",
+        "shiny",
+        "testthat",
+        "uuid",
+        "waldo",
+        "yaml",
+        "webfakes"
+      ],
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.2",
+      "VignetteBuilder": "knitr",
+      "Config/Needs/website": "tidyverse/tidytemplate",
+      "Config/testthat/edition": "3",
+      "Config/testthat/parallel": "true",
+      "Config/testthat/start-first": "bioconductor,python,install,restore,snapshot,retrieve,remotes",
+      "NeedsCompilation": "no",
+      "Author": "Kevin Ushey [aut, cre] (<https://orcid.org/0000-0003-2880-7407>), Hadley Wickham [aut] (<https://orcid.org/0000-0003-4757-117X>), Posit Software, PBC [cph, fnd]",
+      "Maintainer": "Kevin Ushey <kevin@rstudio.com>",
+      "Repository": "CRAN"
+    },
+    "reshape": {
+      "Package": "reshape",
+      "Version": "0.8.5",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Flexibly reshape data.",
+      "Author": "Hadley Wickham <h.wickham@gmail.com>",
+      "Maintainer": "Hadley Wickham <h.wickham@gmail.com>",
+      "Description": "Reshape lets you flexibly restructure and aggregate data using just two functions: melt and cast.",
+      "URL": "http://had.co.nz/reshape",
+      "Depends": [
+        "R (>= 2.6.1)"
+      ],
+      "Imports": [
+        "plyr"
+      ],
+      "License": "MIT + file LICENSE",
+      "LazyData": "true",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "reshape2": {
+      "Package": "reshape2",
+      "Version": "1.4.1",
+      "Source": "Repository",
+      "Title": "Flexibly Reshape Data: A Reboot of the Reshape Package.",
+      "Author": "Hadley Wickham <h.wickham@gmail.com>",
+      "Maintainer": "Hadley Wickham <h.wickham@gmail.com>",
+      "Description": "Flexibly restructure and aggregate data using just two functions: melt and dcast (or acast).",
+      "URL": "https://github.com/hadley/reshape",
+      "BugReports": "https://github.com/hadley/reshape/issues",
+      "LinkingTo": [
+        "Rcpp"
+      ],
+      "Imports": [
+        "plyr (>= 1.8.1)",
+        "stringr",
+        "Rcpp"
+      ],
+      "Suggests": [
+        "testthat (>= 0.8.0)",
+        "lattice"
+      ],
+      "License": "MIT + file LICENSE",
+      "LazyData": "true",
+      "NeedsCompilation": "yes",
+      "Repository": "CRAN"
+    },
+    "scales": {
+      "Package": "scales",
+      "Version": "0.2.4",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Scale functions for graphics.",
+      "Author": "Hadley Wickham <h.wickham@gmail.com>",
+      "Maintainer": "Hadley Wickham <h.wickham@gmail.com>",
+      "Description": "Scales map data to aesthetics, and provide methods for automatically determining breaks and labels for axes and legends.",
+      "URL": "https://github.com/hadley/scales",
+      "BugReports": "https://github.com/hadley/scales/issues",
+      "Depends": [
+        "R (>= 2.13)"
+      ],
+      "Imports": [
+        "RColorBrewer",
+        "dichromat",
+        "munsell (>= 0.2)",
+        "plyr (>= 1.2)",
+        "labeling",
+        "methods"
+      ],
+      "Suggests": [
+        "testthat (>= 0.8)"
+      ],
+      "License": "MIT + file LICENSE",
+      "LazyLoad": "yes",
+      "Roxygen": "list(wrap = FALSE)",
+      "BuildManual": "yes",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "stringr": {
+      "Package": "stringr",
+      "Version": "0.6.2",
+      "Source": "Repository",
+      "Maintainer": "Hadley Wickham <h.wickham@gmail.com>",
+      "License": "GPL-2",
+      "Title": "Make it easier to work with strings.",
+      "Type": "Package",
+      "Author": "Hadley Wickham <h.wickham@gmail.com>",
+      "Description": "stringr is a set of simple wrappers that make R's string functions more consistent, simpler and easier to use.  It does this by ensuring that: function and argument names (and positions) are consistent, all functions deal with NA's and zero length character appropriately, and the output data structures from each function matches the input data structures of other functions.",
+      "Depends": [
+        "R (>= 2.14)"
+      ],
+      "Suggests": [
+        "testthat (>= 0.3)"
+      ],
+      "Collate": "'c.r' 'checks.r' 'count.r' 'detect.r' 'dup.r' 'extract.r' 'length.r' 'locate.r' 'match.r' 'modifiers.r' 'pad-trim.r' 'replace.r' 'split.r' 'sub.r' 'vectorise.r' 'word.r' 'wrap.r' 'utils.r'",
+      "Repository": "CRAN"
+    }
+  }
+}

@@ -1101,7 +1101,7 @@ print("INDUCED GROWTH AND TRAVEL")
 	TransitTrips.Pt <- rowSums(apply(PlaceTypeGrowth.Pt,1,"*",PlaceTypeDDiscount.Pt["TransitTrips",]) * TripsPerCapita["Transit",])
 	Walking.Ma <- sum(apply(PlaceTypeGrowth.Pt,1,"*",PlaceTypeDDiscount.Pt["Walking",] - 1))/sum(PlaceTypeGrowth.Pt)
 	Access.Ma <- sum(apply(PlaceTypeGrowth.Pt,1,"*",AccessiblityPercentChange.Pt))/sum(PlaceTypeGrowth.Pt)
-	Equity.Ig <- colSums(apply(IncGrp.Pt[,Pt],1,"*",AccessiblityPercentChange.Pt))/rowSums(IncGrp.Pt)	
+	Equity.Ig <- colSums(apply(IncGrp.Pt,1,"*",AccessiblityPercentChange.Pt))/rowSums(IncGrp.Pt)	
 	
 	#Calculate factors to adjust hh Dvmt by Place Type
 	Dvmt.Pt <- Pop.Pt * 0	
@@ -2001,8 +2001,13 @@ exportoutputs <- function() {
   #=========================== 
   outputslist <- read.csv(file.path(ScriptDir,"outputs.csv"))
   loadwrite <- function(filename){
+	print(filename)
     load(file.path("outputs",filename))
-    write.csv(get(sub(".RData","",filename)),file=file.path("outputs",sub(".RData",".csv",filename)))
+	data_obj <- get(sub(".RData","",filename))
+	if ("table" %in% class(data_obj)) {
+		data_obj <- as.data.frame(as.list(data_obj))
+	}
+    write.csv(data_obj,file=file.path("outputs",sub(".RData",".csv",filename)))
   }
   lapply(outputslist$filename,loadwrite)
 }
