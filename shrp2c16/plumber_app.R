@@ -38,7 +38,7 @@ log_info("Report directory: %s", report_dir)
 # Helper function to kill any existing RPAT processes
 kill_existing_processes <- function() {
   # Remove the stdout.txt file
-  stdout_path <- here::here("shrp2c16", "projects", "stdout.txt")
+  stdout_path <- "stdout.txt"
   if (!dir.exists(dirname(stdout_path))) {
     dir.create(dirname(stdout_path), recursive = TRUE)
   }
@@ -139,7 +139,7 @@ function() {
 #* @serializer json
 function() {
   log_info("GET /runstatus request received")
-  stdout_path <- here::here("shrp2c16", "projects", "stdout.txt")
+  stdout_path <- "stdout.txt"
   if (file.exists(stdout_path)) {
     content <- readLines(stdout_path, n = 1, warn = FALSE)
     log_info("Read content from stdout.txt: %s", content)
@@ -169,7 +169,7 @@ function() {
 
 #* @get /state_files/:name
 #* @serializer json
-function(name) {
+function(req, name) {
   log_info("GET /state_files/%s request received", name)
   path <- here::here("shrp2c16", "projects", "project", name, "parameters")
   
@@ -289,7 +289,7 @@ function(name, fromScenario, isFirst) {
 
 #* @get /delete_scenario
 #* @serializer json
-function(name) {
+function(req, name) {
   log_info("GET /delete_scenario request received with name: %s", name)
   
   scenario_dir <- here::here("shrp2c16", "projects", "project", name)
@@ -310,7 +310,7 @@ function(name) {
 
 #* @get /scenario
 #* @serializer json
-function(name) {
+function(req, name) {
   log_info("GET /scenario request received for name: %s", name)
   
   path <- here::here("shrp2c16", "projects", "project", name, "inputs")
@@ -551,6 +551,15 @@ function(req, data, name, fileName) {
   })
 }
 
+#* @get /loadoutputcsvfile
+#* @param name
+#* @param fileName
+loadoutputcsvfile <- function(req, name="", fileName=""){
+  file_path <- here::here("shrp2c16", "projects", "project", name, "inputs", fileName)
+  out <- read.csv(file_path, header = FALSE, stringsAsFactors = FALSE)
+  list(data = unname(lapply(1:nrow(out), function(i) as.list(out[i,])))) # Convert to list of lists and remove names
+}
+
 #* @post /savestatecsvfile
 #* @serializer json
 function(req, data, name, fileName, directory = "root") {
@@ -648,7 +657,7 @@ function(state) {
 function() {
   log_info("GET /resetrunstatus request received")
   
-  stdout_path <- here::here("shrp2c16", "projects", "stdout.txt")
+  stdout_path <- "stdout.txt"
   tryCatch({
     writeLines("pending", stdout_path)
     log_info("Reset run status to 'pending'")
@@ -661,7 +670,7 @@ function() {
 
 #* @get /output_files
 #* @serializer json
-function(name) {
+function(req, name) {
   log_info("GET /output_files request received for scenario: %s", name)
   
   output_dir <- here::here("shrp2c16", "projects", "project", name, "outputs")
@@ -711,16 +720,16 @@ function(name = NULL) {
 
 #* @get /startrun
 #* @serializer json
-function(name) {
+function(req, name) {
   log_info("GET /startrun request received for scenario: %s", name)
   
   # Reset stdout.txt to 'pending'
-  stdout_path <- here::here("projects", "stdout.txt")
+  stdout_path <- "stdout.txt"
   writeLines("pending", stdout_path)
   
   # Get the path to the scenario directory
-  scenario_dir <- here::here("projects", "project", name)
-  script_path <- here::here("scripts", "SmartGAP.r")
+  scenario_dir <- here::here("shrp2c16", "projects", "project", name)
+  script_path <- here::here("shrp2c16", "scripts", "SmartGAP.r")
   
   # Check if directories and files exist
   if (!dir.exists(scenario_dir)) {
@@ -736,26 +745,28 @@ function(name) {
   log_info("Starting model run for scenario: %s", name)
   log_info("Working directory: %s", scenario_dir)
   log_info("Script path: %s", script_path)
+
+  log_path <- file.path("rpat_sim.log")
+  writeLines("", log_path)
+
+  # Run the R script as a separate process and capture output to sim.log
   
-  tryCatch({
-    # Create a shell script to run the command with proper working directory
-    # This is more reliable than using cd && in system() across different platforms
-    setwd(scenario_dir)
-    source(script_path)
-    
-    return(list(success = TRUE, message = "Model run started"))
-  }, error = function(e) {
-    # Generate a traceback string
-    tb <- paste(capture.output(traceback()), collapse = "\n")
-    log_error("Error starting model run: %s\nTraceback: %s", conditionMessage(e), tb)
-    
-    # Set response headers even on error
-    req$res$setHeader("Access-Control-Allow-Origin", "*")
-    req$res$setHeader("Content-Type", "application/json")
-    req$res$setHeader("X-Plumber-Error", "true")
-    
-    return(list(success = FALSE, error = conditionMessage(e)))
-  })
+  # Create the system command to run the R script
+  cmd_args <- c(shQuote(script_path), "'-s'", shQuote(name))
+  #cmd_args <- c("-e", "'print(getwd())'")
+  
+  # Execute the command and redirect output to sim.log
+  # On Mac/Linux, we can use system() with wait=FALSE to run asynchronously
+  #result <- system2("Rscript", args = cmd_args, stdout = shQuote(log_path), stderr = shQuote(log_path), wait = FALSE)
+  result <- system2("Rscript", args = cmd_args, stdout = log_path, stderr = TRUE, wait = FALSE)
+  #log_info(result)
+
+  # Also write to stdout.txt for status monitoring
+  #stdout_path <- "stdout.txt"
+  #write("running", file = stdout_path)
+  
+  return(list(success = TRUE, message = "Model run started"))
+
 }
 
 #* @get /stoprun
@@ -785,7 +796,7 @@ function() {
     }
     
     # Reset stdout.txt
-    stdout_path <- here::here("shrp2c16", "projects", "stdout.txt")
+    stdout_path <- "stdout.txt"
     writeLines("", stdout_path)
     
     return(list(success = TRUE, message = "Model run stopped"))
@@ -879,89 +890,29 @@ function(req) {
         
         # Create a simple report file directly
         log_info("Generating report image: %s", image_filename)
-        
+        log_path <- file.path("rpat_reports.log")
+        script_path <- here::here("shrp2c16", "scripts", "SmartGAP_Reports.r")
+
         # Execute in a tryCatch block to handle errors
         tryCatch({
-          # Change to the scenario directory first
-          original_dir <- getwd()
-          setwd(scenario_dir)
-          
-          # Ensure required packages are loaded
-          if (!requireNamespace("ggplot2", quietly = TRUE)) {
-            install.packages("ggplot2", quiet = TRUE)
-          }
-          library(ggplot2)
-          
-          # Create a simple plot as a placeholder
-          # In a real implementation, this would process actual data from scenario outputs
-          output_file <- file.path(scenario_dir, "outputs", paste0(metric_parts[2], ".csv"))
-          
-          # Check if output file exists
-          if (file.exists(output_file)) {
-            log_info("Using output file: %s", output_file)
-            
-            # Read the data
-            data <- tryCatch({
-              read.csv(output_file)
-            }, error = function(e) {
-              log_error("Failed to read output file: %s", conditionMessage(e))
-              NULL
-            })
-            
-            if (!is.null(data)) {
-              # Create a basic plot - we'll customize this based on the actual data structure
-              outPath <- file.path(report_dir, image_filename)
-              
-              # Create a simple plot as a fallback/demo
-              p <- ggplot(data) + 
-                   ggtitle(paste("Report:", metric_parts[2], "for", scenarios_delimited)) +
-                   theme_minimal()
-                   
-              # Add more layers based on what columns are available
-              if ("Year" %in% names(data)) {
-                # Find numeric columns to plot
-                numeric_cols <- sapply(data, is.numeric)
-                numeric_cols <- numeric_cols & names(data) != "Year"
-                
-                if (any(numeric_cols)) {
-                  col_to_plot <- names(data)[which(numeric_cols)[1]]
-                  p <- p + 
-                       aes_string(x = "Year", y = col_to_plot) +
-                       geom_line() +
-                       geom_point()
-                }
-              }
-              
-              # Save the plot
-              ggsave(filename = outPath, plot = p, width = 10, height = 6)
-              log_info("Report image saved to: %s", outPath)
-            } else {
-              # Create an empty/error plot if data couldn't be read
-              p <- ggplot() + 
-                   annotate("text", x = 0.5, y = 0.5, 
-                            label = paste("Error: Could not process data for", metric_parts[2])) +
-                   theme_void()
-              
-              outPath <- file.path(report_dir, image_filename)
-              ggsave(filename = outPath, plot = p, width = 10, height = 6)
-              log_info("Error plot saved to: %s", outPath)
-            }
-          } else {
-            # Create an empty/error plot if output file doesn't exist
-            log_warn("Output file not found: %s", output_file)
-            
-            p <- ggplot() + 
-                 annotate("text", x = 0.5, y = 0.5, 
-                          label = paste("Error: Output file not found for", metric_parts[2])) +
-                 theme_void()
-            
-            outPath <- file.path(report_dir, image_filename)
-            ggsave(filename = outPath, plot = p, width = 10, height = 6)
-            log_info("Error plot saved to: %s", outPath)
-          }
-          
-          # Return to original directory
-          setwd(original_dir)
+            # Create the system command to run the R script
+            cmd_args <- c(shQuote(script_path), 
+                          "'-s'", 
+                          shQuote(scenarios_delimited),
+                          "'-p'",
+                          shQuote(metric_parts[2]),
+                          "'-a'",
+                          shQuote(metric_parts[1]),
+                          "'-m'",
+                          shQuote(measure)
+                        )
+            log_info(cmd_args)
+            # Execute the command and redirect output to sim.log
+            # On Mac/Linux, we can use system() with wait=FALSE to run asynchronously
+            result <- system2("Rscript", args = cmd_args, stdout = log_path, stderr = TRUE, wait = FALSE)
+            log_info(result)
+
+
         }, error = function(e) {
           # Generate a traceback string
           tb <- paste(capture.output(traceback()), collapse = "\n")
@@ -1005,7 +956,7 @@ create_launcher_script <- function() {
   kill_existing_processes()
   
   # Create a new plumber router from this file
-  api_file <- here::here("shrp2c16", "gui", "plumber_app.R")
+  api_file <- here::here("shrp2c16", "plumber_app.R")
   log_info("Loading API from file: %s", api_file)
   
   # Run the API server
@@ -1036,14 +987,14 @@ create_launcher_script <- function() {
     log_info("Adding static file handlers")
     
     # Mount the root views directory (serves index.html and other root files)
-    pr <- pr %>% 
+    pr <- pr |> 
       pr_static("/", views_dir)
     
     # Mount CSS directory
     css_dir <- here::here("shrp2c16", "gui", "views", "CSS")
     if (dir.exists(css_dir)) {
       log_info("CSS directory exists at: %s", css_dir)
-      pr <- pr %>% 
+      pr <- pr |> 
         pr_static("/CSS", css_dir)
     } else {
       log_warn("CSS directory not found at: %s", css_dir)
@@ -1053,7 +1004,7 @@ create_launcher_script <- function() {
     js_dir <- here::here("shrp2c16", "gui", "views", "JScripts")
     if (dir.exists(js_dir)) {
       log_info("JS directory exists at: %s", js_dir)
-      pr <- pr %>% 
+      pr <- pr |> 
         pr_static("/JScripts", js_dir)
     } else {
       log_warn("JS directory not found at: %s", js_dir)
@@ -1063,7 +1014,7 @@ create_launcher_script <- function() {
     img_dir <- here::here("shrp2c16", "gui", "views", "img")
     if (dir.exists(img_dir)) {
       log_info("Image directory exists at: %s", img_dir)
-      pr <- pr %>% 
+      pr <- pr |> 
         pr_static("/img", img_dir)
     } else {
       log_warn("Image directory not found at: %s", img_dir)
@@ -1073,7 +1024,7 @@ create_launcher_script <- function() {
     docs_dir <- here::here("shrp2c16", "gui", "views", "docs")
     if (dir.exists(docs_dir)) {
       log_info("Docs directory exists at: %s", docs_dir)
-      pr <- pr %>% 
+      pr <- pr |> 
         pr_static("/docs", docs_dir)
     } else {
       log_warn("Docs directory not found at: %s", docs_dir)
@@ -1083,17 +1034,17 @@ create_launcher_script <- function() {
     reports_dir <- here::here("shrp2c16", "projects", "project", "reports")
     if (dir.exists(reports_dir)) {
       log_info("Reports directory exists at: %s", reports_dir)
-      pr <- pr %>% 
+      pr <- pr |> 
         pr_static("/reports", reports_dir)
     } else {
       log_info("Reports directory not found, creating at: %s", reports_dir)
       dir.create(reports_dir, recursive = TRUE, showWarnings = FALSE)
-      pr <- pr %>% 
+      pr <- pr |> 
         pr_static("/reports", reports_dir)
     }
     
     # Run the app
-    pr$run(port = 8765, host = "0.0.0.0")
+    pr$run(port = 8765, host = "127.0.0.1")
   }, error = function(e) {
     log_error("Failed to start server: %s", conditionMessage(e))
     log_error("Stack trace: %s", paste(capture.output(traceback()), collapse="\n"))
