@@ -536,7 +536,7 @@ function(req, data, name, fileName) {
 #* @param name
 #* @param fileName
 loadoutputcsvfile <- function(req, name="", fileName=""){
-  file_path <- here::here("shrp2c16", "projects", "project", name, "inputs", fileName)
+  file_path <- here::here("shrp2c16", "projects", "project", name, "outputs", fileName)
   out <- read.csv(file_path, header = FALSE, stringsAsFactors = FALSE)
   list(data = unname(lapply(1:nrow(out), function(i) as.list(out[i,])))) # Convert to list of lists and remove names
 }
@@ -739,12 +739,12 @@ function(req, name) {
   # Execute the command and redirect output to sim.log
   # On Mac/Linux, we can use system() with wait=FALSE to run asynchronously
   #result <- system2("Rscript", args = cmd_args, stdout = shQuote(log_path), stderr = shQuote(log_path), wait = FALSE)
-  result <- system2("Rscript", args = cmd_args, stdout = log_path, stderr = TRUE, wait = FALSE)
-  #log_info(result)
+  result <- system2("Rscript", args = cmd_args, stdout = TRUE, stderr = TRUE, wait = FALSE)
+  log_info(result)
 
   # Also write to stdout.txt for status monitoring
-  #stdout_path <- "stdout.txt"
-  #write("running", file = stdout_path)
+  stdout_path <- "stdout.txt"
+  writeLines("running", file = stdout_path)
   
   return(list(success = TRUE, message = "Model run started"))
 
@@ -905,9 +905,7 @@ function(req) {
       }
     }
   }
-  
-
-  
+ 
   # Return JSON similar to Python implementation
   result <- list(
     scenarios = scenarios,
@@ -923,6 +921,8 @@ function(req) {
   return(result)
 }
 
+#* @assets ./projects/project/reports /reports
+list()
 
 # Define a custom serializer function for the module
 serializer_unboxed_json <- function() {
@@ -930,57 +930,6 @@ serializer_unboxed_json <- function() {
     res$body <- toJSON(val, auto_unbox = TRUE, pretty = TRUE)
     res
   }
-}
-
-#* @get /image/*
-#* @serializer octet
-function(req, res, ...) {
-  # Extract the image path from the URL
-  path_parts <- list(...)
-  image_path <- paste(path_parts, collapse = "/")
-  
-  # Determine full path of the image (looking in reports directory)
-  full_path <- file.path(report_dir, image_path)
-  
-  if (!file.exists(full_path)) {
-    # Also check in the views/img directory for UI assets
-    full_path <- file.path(views_dir, "img", image_path)
-    if (!file.exists(full_path)) {
-      # Also check in CSS/images directory
-      full_path <- file.path(views_dir, "CSS", "images", image_path)
-      if (!file.exists(full_path)) {
-        log_error("Image file not found: %s", image_path)
-        res$status <- 404
-        return(list(error = "Image file not found"))
-      }
-    }
-  }
-  
-  # Get file extension to determine content type
-  ext <- tolower(tools::file_ext(full_path))
-  content_type <- switch(ext,
-    "png" = "image/png",
-    "jpg" = "image/jpeg",
-    "jpeg" = "image/jpeg",
-    "gif" = "image/gif",
-    "svg" = "image/svg+xml",
-    "css" = "text/css",
-    "js" = "application/javascript",
-    "ico" = "image/x-icon",
-    "application/octet-stream"  # Default binary type
-  )
-  
-  # Set the content type header
-  res$setHeader("Content-Type", content_type)
-  
-  # Add Content-Disposition header to encourage inline display
-  res$setHeader("Content-Disposition", paste0("inline; filename=\"", basename(full_path), "\""))
-  
-  # Log the file being served
-  log_info("Serving binary file: %s as %s", full_path, content_type)
-  
-  # Return the binary content
-  readBin(full_path, "raw", file.info(full_path)$size)
 }
 
 #* @get /CSS/*
