@@ -16,6 +16,7 @@ library(httr)
 library(ps)
 library(here)
 library(logger)
+library(fs)
 
 # Fix logger initialization
 # Some basic configurations
@@ -69,44 +70,24 @@ function(req, res) {
 }
 
 #* @filter cors
-function(res) {
+function(req, res) {
+  # Log the request URL for debugging
+  log_info("Request URL: %s %s", req$REQUEST_METHOD, req$PATH_INFO)
+  # Log all request headers for debugging
+  for (name in names(req$HTTP_HEADERS)) {
+    log_debug("Header: %s = %s", name, req$HTTP_HEADERS[[name]])
+  }
+  
   res$setHeader("Access-Control-Allow-Origin", "*")
   res$setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
   res$setHeader("Access-Control-Allow-Headers", "Content-Type")
-  res$setHeader("Content-Type", "application/json")
+  
+  # Only set Content-Type to application/json for API endpoints, not for static assets
+  if (!grepl("^/(CSS|JScripts|img|image)/", req$PATH_INFO)) {
+    res$setHeader("Content-Type", "application/json")
+  }
+  
   plumber::forward()
-}
-
-#* @get /
-#* @serializer html
-function() {
-  log_info("GET / request received")
-  index_path <- file.path(views_dir, "index.html")
-  if (file.exists(index_path)) {
-    # Use readChar instead of readLines to avoid newline issues
-    res <- readChar(index_path, file.info(index_path)$size)
-    log_info("Returning index.html with %d characters", nchar(res))
-    return(res)
-  } else {
-    log_error("Index file not found at: %s", index_path)
-    return("Index file not found")
-  }
-}
-
-#* @get /index.html
-#* @serializer html 
-function() {
-  log_info("GET /index.html request received")
-  index_path <- file.path(views_dir, "index.html")
-  if (file.exists(index_path)) {
-    # Use readChar instead of readLines to avoid newline issues
-    res <- readChar(index_path, file.info(index_path)$size)
-    log_info("Returning index.html with %d characters", nchar(res))
-    return(res)
-  } else {
-    log_error("Index file not found at: %s", index_path)
-    return("Index file not found")
-  }
 }
 
 #* @get /api/status
@@ -925,10 +906,7 @@ function(req) {
     }
   }
   
-  # Modify image paths to use our new image endpoint instead of direct file access
-  modified_images <- sapply(images, function(img) {
-    paste0("/image/", img)
-  })
+
   
   # Return JSON similar to Python implementation
   result <- list(
@@ -945,153 +923,131 @@ function(req) {
   return(result)
 }
 
-# Create and run the Plumber app
-create_launcher_script <- function() {
-  log_info("Creating Plumber API")
-  
-  # Create directory structure
-  if (!dir.exists(report_dir)) {
-    dir.create(report_dir, recursive = TRUE)
-    log_info("Created report directory: %s", report_dir)
+
+# Define a custom serializer function for the module
+serializer_unboxed_json <- function() {
+  function(val, req, res, err) {
+    res$body <- toJSON(val, auto_unbox = TRUE, pretty = TRUE)
+    res
   }
-  
-  # Kill existing processes
-  kill_existing_processes()
-  
-  # Create a new plumber router from this file
-  api_file <- here::here("shrp2c16", "plumber_app.R")
-  log_info("Loading API from file: %s", api_file)
-  
-  # Run the API server
-  log_info("Starting server on port 8765")
-  cat("Starting server on port 8765\n")
-  
-  # Start the server directly from this file
-  tryCatch({
-    pr <- plumb(api_file)
-    
-    # Add a custom error filter to log errors
-    pr$registerHook("postroute", function(req, res) {
-      # Log 404 errors
-      if (res$status == 404) {
-        log_warn("Endpoint not found: %s %s", req$REQUEST_METHOD, req$PATH_INFO)
-      }
-      # Log 500 errors
-      else if (res$status >= 500) {
-        log_error("Server error: %s %s", req$REQUEST_METHOD, req$PATH_INFO)
-      }
-      # Log 400 errors
-      else if (res$status >= 400) {
-        log_warn("Bad request: %s %s", req$REQUEST_METHOD, req$PATH_INFO)
-      }
-    })
-    
-    # Add static file handlers
-    log_info("Adding static file handlers")
-    
-    # Mount the root views directory (serves index.html and other root files)
-    pr <- pr |> 
-      pr_static("/", views_dir)
-    
-    # Mount CSS directory
-    css_dir <- here::here("shrp2c16", "gui", "views", "CSS")
-    if (dir.exists(css_dir)) {
-      log_info("CSS directory exists at: %s", css_dir)
-      pr <- pr |> 
-        pr_static("/CSS", css_dir)
-    } else {
-      log_warn("CSS directory not found at: %s", css_dir)
-    }
-
-    # Mount JavaScript directory
-    js_dir <- here::here("shrp2c16", "gui", "views", "JScripts")
-    if (dir.exists(js_dir)) {
-      log_info("JS directory exists at: %s", js_dir)
-      pr <- pr |> 
-        pr_static("/JScripts", js_dir)
-    } else {
-      log_warn("JS directory not found at: %s", js_dir)
-    }
-
-    # Mount image directory
-    img_dir <- here::here("shrp2c16", "gui", "views", "img")
-    if (dir.exists(img_dir)) {
-      log_info("Image directory exists at: %s", img_dir)
-      pr <- pr |> 
-        pr_static("/img", img_dir)
-    } else {
-      log_warn("Image directory not found at: %s", img_dir)
-    }
-
-    # Mount docs directory
-    docs_dir <- here::here("shrp2c16", "gui", "views", "docs")
-    if (dir.exists(docs_dir)) {
-      log_info("Docs directory exists at: %s", docs_dir)
-      pr <- pr |> 
-        pr_static("/docs", docs_dir)
-    } else {
-      log_warn("Docs directory not found at: %s", docs_dir)
-    }
-
-    # Ensure reports directory exists
-    reports_dir <- here::here("shrp2c16", "projects", "project", "reports")
-    if (!dir.exists(reports_dir)) {
-      log_info("Reports directory not found, creating at: %s", reports_dir)
-      dir.create(reports_dir, recursive = TRUE, showWarnings = FALSE)
-    } else {
-      log_info("Reports directory exists at: %s", reports_dir)
-    }
-    
-    # Register the standard static file handler for reports
-    pr <- pr |> pr_static("/reports", reports_dir)
-    
-    # Add a root static handler for serving views
-    pr <- pr |> pr_static("/", views_dir)
-    
-    # Run the app
-    pr$run(port = 8765, host = "127.0.0.1")
-  }, error = function(e) {
-    log_error("Failed to start server: %s", conditionMessage(e))
-    log_error("Stack trace: %s", paste(capture.output(traceback()), collapse="\n"))
-    cat("Error starting server:", conditionMessage(e), "\n")
-    stop(e)
-  })
-  
-  # Open web browser (will only execute if the server stops)
-  utils::browseURL("http://127.0.0.1:8765/")
 }
 
-#* @get /reports/<filename>
+#* @get /image/*
 #* @serializer octet
-function(filename, res) {
-  log_info("Image endpoint called for: %s", filename) 
-  file_path <- file.path(report_dir, filename)
+function(req, res, ...) {
+  # Extract the image path from the URL
+  path_parts <- list(...)
+  image_path <- paste(path_parts, collapse = "/")
   
-  if (!file.exists(file_path)) {
-    log_warn("Image file not found: %s", file_path)
-    res$status <- 404
-    return(NULL)
+  # Determine full path of the image (looking in reports directory)
+  full_path <- file.path(report_dir, image_path)
+  
+  if (!file.exists(full_path)) {
+    # Also check in the views/img directory for UI assets
+    full_path <- file.path(views_dir, "img", image_path)
+    if (!file.exists(full_path)) {
+      # Also check in CSS/images directory
+      full_path <- file.path(views_dir, "CSS", "images", image_path)
+      if (!file.exists(full_path)) {
+        log_error("Image file not found: %s", image_path)
+        res$status <- 404
+        return(list(error = "Image file not found"))
+      }
+    }
   }
   
-  # Determine content type based on file extension
-  if (grepl("\\.jpeg$", filename, ignore.case = TRUE)) {
-    res$setHeader("Content-Type", "image/jpeg")
-  } else if (grepl("\\.png$", filename, ignore.case = TRUE)) {
-    res$setHeader("Content-Type", "image/png")
-  } else if (grepl("\\.gif$", filename, ignore.case = TRUE)) {
-    res$setHeader("Content-Type", "image/gif")
-  } else {
-    res$setHeader("Content-Type", "application/octet-stream")
-  }
+  # Get file extension to determine content type
+  ext <- tolower(tools::file_ext(full_path))
+  content_type <- switch(ext,
+    "png" = "image/png",
+    "jpg" = "image/jpeg",
+    "jpeg" = "image/jpeg",
+    "gif" = "image/gif",
+    "svg" = "image/svg+xml",
+    "css" = "text/css",
+    "js" = "application/javascript",
+    "ico" = "image/x-icon",
+    "application/octet-stream"  # Default binary type
+  )
   
-  # Force inline display by explicitly setting Content-Disposition
-  res$setHeader("Content-Disposition", "inline")
+  # Set the content type header
+  res$setHeader("Content-Type", content_type)
   
-  log_info("Serving image: %s (%d bytes)", file_path, file.info(file_path)$size)
-  readBin(file_path, "raw", file.info(file_path)$size)
+  # Add Content-Disposition header to encourage inline display
+  res$setHeader("Content-Disposition", paste0("inline; filename=\"", basename(full_path), "\""))
+  
+  # Log the file being served
+  log_info("Serving binary file: %s as %s", full_path, content_type)
+  
+  # Return the binary content
+  readBin(full_path, "raw", file.info(full_path)$size)
 }
 
-# Only run the launcher when this script is run as a main script, not when sourced
-if (sys.nframe() == 0) {
-  create_launcher_script()
+#* @get /CSS/*
+#* @serializer octet
+function(req, res, ...) {
+  # Extract the CSS file path from the URL
+  path_parts <- list(...)
+  css_path <- paste(path_parts, collapse = "/")
+  
+  # Determine full path of the CSS file
+  full_path <- file.path(views_dir, "CSS", css_path)
+  
+  if (!file.exists(full_path)) {
+    log_error("CSS file not found: %s", css_path)
+    res$status <- 404
+    return(list(error = "CSS file not found"))
+  }
+  
+  # Set content type header
+  res$setHeader("Content-Type", "text/css")
+  
+  # Add Content-Disposition header
+  res$setHeader("Content-Disposition", paste0("inline; filename=\"", basename(full_path), "\""))
+  
+  # Log the file being served
+  log_info("Serving CSS file: %s", full_path)
+  
+  # Return the binary content
+  readBin(full_path, "raw", file.info(full_path)$size)
+}
+
+#* @get /JScripts/*
+#* @serializer octet
+function(req, res, ...) {
+  # Extract the JS file path from the URL
+  path_parts <- list(...)
+  js_path <- paste(path_parts, collapse = "/")
+  
+  # Determine full path of the JS file
+  full_path <- file.path(views_dir, "JScripts", js_path)
+  
+  if (!file.exists(full_path)) {
+    log_error("JavaScript file not found: %s", js_path)
+    res$status <- 404
+    return(list(error = "JavaScript file not found"))
+  }
+  
+  # Set content type header
+  res$setHeader("Content-Type", "application/javascript")
+  
+  # Add Content-Disposition header
+  res$setHeader("Content-Disposition", paste0("inline; filename=\"", basename(full_path), "\""))
+  
+  # Log the file being served
+  log_info("Serving JavaScript file: %s", full_path)
+  
+  # Return the binary content
+  readBin(full_path, "raw", file.info(full_path)$size)
+}
+
+#* @plumber
+#* Configure the plumber API
+function(pr) {
+    # Set global JSON serializer for all endpoints
+    pr %>% 
+      pr_set_serializer(serializer_unboxed_json())
+    
+    # Return the configured API object
+    pr
 }

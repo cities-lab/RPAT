@@ -1,17 +1,19 @@
-#!/usr/bin/env Rscript
-
-# Load required packages
-if (!require("logger")) install.packages("logger")
-if (!require("here")) install.packages("here")
-
 library(plumber)
-library(logger)
-library(here)
 
-source("plumber_app.R")
+# Create and configure the API using the updated plumber 1.0.0+ approach
+# Instead of using plumber$new(), we'll use pr() and a programmatic approach
+dir <- getwd()
+report_dir <- file.path(getwd(), "projects", "project", "reports")
 
-# Call the function to create and run the API server
-log_info("Calling create_launcher_script()")
-create_launcher_script()
+# Get the API from the current file
+api <- pr(file = "plumber_app.R")
 
-utils::browseURL("http://127.0.0.1:8765/")
+# Configure static file serving
+api <- pr_static(api, "/", file.path(dir, "gui", "views"))
+api <- pr_static(api, "/reports", report_dir)
+
+# Start the server
+pr_run(api, host = "0.0.0.0", port = 8765, docs = FALSE)
+
+# Open browser
+#browseURL("http://127.0.0.1:8765/index.html")
