@@ -890,7 +890,7 @@ function(req) {
         
         # Create a simple report file directly
         log_info("Generating report image: %s", image_filename)
-        log_path <- file.path("rpat_reports.log")
+        #log_path <- file.path("rpat_reports.log")
         script_path <- here::here("shrp2c16", "scripts", "SmartGAP_Reports.r")
 
         # Execute in a tryCatch block to handle errors
@@ -906,13 +906,11 @@ function(req) {
                           "'-m'",
                           shQuote(measure)
                         )
-            log_info(cmd_args)
+            #log_info(cmd_args)
             # Execute the command and redirect output to sim.log
             # On Mac/Linux, we can use system() with wait=FALSE to run asynchronously
-            result <- system2("Rscript", args = cmd_args, stdout = log_path, stderr = TRUE, wait = FALSE)
+            result <- system2("Rscript", args = cmd_args, stdout = TRUE, stderr = TRUE, wait = FALSE)
             log_info(result)
-
-
         }, error = function(e) {
           # Generate a traceback string
           tb <- paste(capture.output(traceback()), collapse = "\n")
@@ -926,6 +924,11 @@ function(req) {
       }
     }
   }
+  
+  # Modify image paths to use our new image endpoint instead of direct file access
+  modified_images <- sapply(images, function(img) {
+    paste0("/image/", img)
+  })
   
   # Return JSON similar to Python implementation
   result <- list(
@@ -1030,18 +1033,20 @@ create_launcher_script <- function() {
       log_warn("Docs directory not found at: %s", docs_dir)
     }
 
-    # Mount reports directory
+    # Ensure reports directory exists
     reports_dir <- here::here("shrp2c16", "projects", "project", "reports")
-    if (dir.exists(reports_dir)) {
-      log_info("Reports directory exists at: %s", reports_dir)
-      pr <- pr |> 
-        pr_static("/reports", reports_dir)
-    } else {
+    if (!dir.exists(reports_dir)) {
       log_info("Reports directory not found, creating at: %s", reports_dir)
       dir.create(reports_dir, recursive = TRUE, showWarnings = FALSE)
-      pr <- pr |> 
-        pr_static("/reports", reports_dir)
+    } else {
+      log_info("Reports directory exists at: %s", reports_dir)
     }
+    
+    # Register the standard static file handler for reports
+    pr <- pr |> pr_static("/reports", reports_dir)
+    
+    # Add a root static handler for serving views
+    pr <- pr |> pr_static("/", views_dir)
     
     # Run the app
     pr$run(port = 8765, host = "127.0.0.1")
@@ -1054,6 +1059,36 @@ create_launcher_script <- function() {
   
   # Open web browser (will only execute if the server stops)
   utils::browseURL("http://127.0.0.1:8765/")
+}
+
+#* @get /reports/<filename>
+#* @serializer octet
+function(filename, res) {
+  log_info("Image endpoint called for: %s", filename) 
+  file_path <- file.path(report_dir, filename)
+  
+  if (!file.exists(file_path)) {
+    log_warn("Image file not found: %s", file_path)
+    res$status <- 404
+    return(NULL)
+  }
+  
+  # Determine content type based on file extension
+  if (grepl("\\.jpeg$", filename, ignore.case = TRUE)) {
+    res$setHeader("Content-Type", "image/jpeg")
+  } else if (grepl("\\.png$", filename, ignore.case = TRUE)) {
+    res$setHeader("Content-Type", "image/png")
+  } else if (grepl("\\.gif$", filename, ignore.case = TRUE)) {
+    res$setHeader("Content-Type", "image/gif")
+  } else {
+    res$setHeader("Content-Type", "application/octet-stream")
+  }
+  
+  # Force inline display by explicitly setting Content-Disposition
+  res$setHeader("Content-Disposition", "inline")
+  
+  log_info("Serving image: %s (%d bytes)", file_path, file.info(file_path)$size)
+  readBin(file_path, "raw", file.info(file_path)$size)
 }
 
 # Only run the launcher when this script is run as a main script, not when sourced
