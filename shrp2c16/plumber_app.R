@@ -740,7 +740,7 @@ function(req, name) {
   #stdout_path <- here::here("shrp2c16", "stdout.txt")
   #writeLines("done", stdout_path)
   
-  return(list(success = TRUE, message = "Model run completed"))
+  return(list(success = TRUE, message = "Model run started"))
 
 }
 
