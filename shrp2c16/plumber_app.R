@@ -39,10 +39,7 @@ log_info("Report directory: %s", report_dir)
 # Helper function to kill any existing RPAT processes
 kill_existing_processes <- function() {
   # Remove the stdout.txt file
-  stdout_path <- "stdout.txt"
-  if (!dir.exists(dirname(stdout_path))) {
-    dir.create(dirname(stdout_path), recursive = TRUE)
-  }
+  stdout_path <- here::here("shrp2c16", "stdout.txt")
   
   # Initialize stdout.txt
   writeLines("", stdout_path)
@@ -120,7 +117,7 @@ function() {
 #* @serializer json
 function() {
   log_info("GET /runstatus request received")
-  stdout_path <- "stdout.txt"
+  stdout_path <- here::here("shrp2c16", "stdout.txt")
   if (file.exists(stdout_path)) {
     content <- readLines(stdout_path, n = 1, warn = FALSE)
     log_info("Read content from stdout.txt: %s", content)
@@ -638,7 +635,7 @@ function(state) {
 function() {
   log_info("GET /resetrunstatus request received")
   
-  stdout_path <- "stdout.txt"
+  stdout_path <- here::here("shrp2c16", "stdout.txt")
   tryCatch({
     writeLines("pending", stdout_path)
     log_info("Reset run status to 'pending'")
@@ -705,7 +702,7 @@ function(req, name) {
   log_info("GET /startrun request received for scenario: %s", name)
   
   # Reset stdout.txt to 'pending'
-  stdout_path <- "stdout.txt"
+  stdout_path <- here::here("shrp2c16", "stdout.txt")
   writeLines("pending", stdout_path)
   
   # Get the path to the scenario directory
@@ -727,26 +724,23 @@ function(req, name) {
   log_info("Working directory: %s", scenario_dir)
   log_info("Script path: %s", script_path)
 
-  log_path <- file.path("rpat_sim.log")
-  writeLines("", log_path)
+  #log_path <- here::here("shrp2c16", "rpat_run.log")
 
   # Run the R script as a separate process and capture output to sim.log
   
   # Create the system command to run the R script
   cmd_args <- c(shQuote(script_path), "'-s'", shQuote(name))
-  #cmd_args <- c("-e", "'print(getwd())'")
   
   # Execute the command and redirect output to sim.log
   # On Mac/Linux, we can use system() with wait=FALSE to run asynchronously
-  #result <- system2("Rscript", args = cmd_args, stdout = shQuote(log_path), stderr = shQuote(log_path), wait = FALSE)
-  result <- system2("Rscript", args = cmd_args, stdout = TRUE, stderr = TRUE, wait = FALSE)
-  log_info(result)
+  result <- system2("Rscript", args = cmd_args, stdout = FALSE, stderr = FALSE, wait = TRUE)
+  #log_info(result)
 
   # Also write to stdout.txt for status monitoring
-  stdout_path <- "stdout.txt"
-  writeLines("running", file = stdout_path)
+  #stdout_path <- here::here("shrp2c16", "stdout.txt")
+  #writeLines("done", stdout_path)
   
-  return(list(success = TRUE, message = "Model run started"))
+  return(list(success = TRUE, message = "Model run completed"))
 
 }
 
@@ -777,7 +771,7 @@ function() {
     }
     
     # Reset stdout.txt
-    stdout_path <- "stdout.txt"
+    stdout_path <- here::here("shrp2c16", "stdout.txt")
     writeLines("", stdout_path)
     
     return(list(success = TRUE, message = "Model run stopped"))

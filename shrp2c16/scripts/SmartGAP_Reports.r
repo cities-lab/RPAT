@@ -1,7 +1,7 @@
 #===========
 #SmartGAP_Reports.r
 #===========
-
+sink("rpat_reports.log")
 #This program was developed as part of the SHRP 2 C16 project, The Effect of Smart Growth Policies on Travel Demand 
 #See http://apps.trb.org/cmsfeed/TRBNetProjectDisplay.asp?ProjectID=2355
 #The prime contractor for this project is RSG, Inc., http://www.rsginc.com
