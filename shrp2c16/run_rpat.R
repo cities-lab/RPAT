@@ -1,3 +1,5 @@
+renv::restore()
+
 library(plumber)
 
 # Create and configure the API using the updated plumber 1.0.0+ approach
