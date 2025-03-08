@@ -777,6 +777,7 @@ $(document).ajaxStop($.unblockUI);
 		              success: function (res) {
 		              	$("#stateFileEdit").css("display", "none");
 				     	$("#buttondiv").css("display", "none");
+                        $.unblockUI(); // Explicitly unblock UI when save completes
 		              },
 		              error: function () {
 		              }

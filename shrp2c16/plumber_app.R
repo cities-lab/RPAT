@@ -544,58 +544,74 @@ loadoutputcsvfile <- function(req, name="", fileName=""){
 
 #* @post /savestatecsvfile
 #* @serializer json
-function(req, data, name, fileName, directory = "root") {
+function(req, res, data, name, fileName, directory = "root") {
   log_info("POST /savestatecsvfile request received for scenario: %s, file: %s, directory: %s", 
            name, fileName, directory)
   
+  # Use identical structure to the Python implementation
   tryCatch({
-    # Parse the JSON data directly
-    parsed_data <- jsonlite::fromJSON(data)
+    # Parse the JSON data just like the Python implementation
+    parsed_data <- jsonlite::fromJSON(data, simplifyVector = FALSE)
     
-    # Determine the file path
-    file_path <- here::here("shrp2c16", "projects", "project", name, "parameters", fileName)
+    # Determine the file path - exactly matching Python path
+    file_path <- file.path(getwd(), "projects", "project", name, "parameters", fileName)
     
     # Create directory if it doesn't exist
     parent_dir <- dirname(file_path)
     if (!dir.exists(parent_dir)) {
-      log_info("Creating missing parent directory: %s", parent_dir)
       dir.create(parent_dir, recursive = TRUE, showWarnings = FALSE)
     }
     
-    # Write data to CSV - using a different approach to avoid the function application error
-    if (is.data.frame(parsed_data)) {
-      # If it's already a data frame, write it directly
-      write.csv(parsed_data, file = file_path, row.names = FALSE, quote = FALSE)
-    } else if (is.list(parsed_data)) {
-      # If it's a list, convert to a data frame first
-      df <- as.data.frame(do.call(rbind, parsed_data), stringsAsFactors = FALSE)
-      write.csv(df, file = file_path, row.names = FALSE, quote = FALSE)
-    } else {
-      # For other types, try to convert to character matrix first
-      write.table(parsed_data, file = file_path, sep = ",", quote = FALSE, 
-                row.names = FALSE, col.names = FALSE)
-    }
+    # Use a similar approach to the Python CSV writer
+    file_conn <- NULL
+    tryCatch({
+      # Create a simple CSV writer like Python - using csvfile mode
+      csv_data <- lapply(parsed_data, function(row) {
+        # Extract values, handling arrays by taking first element
+        unlist(lapply(row, function(cell) {
+          if (is.list(cell) && length(cell) > 0) {
+            as.character(cell[[1]])
+          } else {
+            as.character(cell)
+          }
+        }))
+      })
+      
+      # Write using write.table which is closer to Python's CSV writer
+      write.table(
+        do.call(rbind, csv_data),
+        file = file_path,
+        sep = ",",
+        row.names = FALSE,
+        col.names = FALSE,
+        quote = FALSE
+      )
+      
+      log_info("Successfully saved state CSV file: %s", file_path)
+    }, finally = {
+      # No explicit file closing needed with write.table
+    })
     
-    log_info("Successfully saved state CSV file: %s", file_path)
+    # Set headers exactly as CherryPy would
+    res$setHeader("Access-Control-Allow-Origin", "*")
+    res$setHeader("Content-Type", "application/json")
     
-    # Set response headers to ensure AJAX completes properly
-    req$res$setHeader("Access-Control-Allow-Origin", "*")
-    req$res$setHeader("Content-Type", "application/json")
-    req$res$setHeader("X-Plumber-Success", "true")
-  
-    # Return exact format from Python implementation
-    return(list(success = TRUE))
+    # Add a custom header to trigger unblockUI in the JavaScript
+    res$setHeader("X-UnblockUI", "true")
+    
+    # Return the exact same structure as Python's return
+    return(list(success = TRUE, unblock = TRUE))
+    
   }, error = function(e) {
-    # Generate a traceback string
-    tb <- paste(capture.output(traceback()), collapse = "\n")
-    log_error("Error saving state CSV file: %s. Error: %s\nTraceback: %s", fileName, conditionMessage(e), tb)
+    log_error("Error saving CSV: %s", conditionMessage(e))
     
-    # Set response headers even on error
-    req$res$setHeader("Access-Control-Allow-Origin", "*")
-    req$res$setHeader("Content-Type", "application/json")
-    req$res$setHeader("X-Plumber-Error", "true")
+    # Set headers for error case
+    res$setHeader("Access-Control-Allow-Origin", "*")
+    res$setHeader("Content-Type", "application/json")
+    res$status <- 500
     
-    return(list(success = FALSE, error = conditionMessage(e)))
+    # Return error response
+    return(list(success = FALSE))
   })
 }
 
