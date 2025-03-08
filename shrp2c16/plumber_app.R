@@ -32,6 +32,10 @@ root_dir <- here::here()
 views_dir <- here::here("shrp2c16", "gui", "views")
 report_dir <- here::here("shrp2c16", "projects", "project", "reports")
 
+# Determine which Rscript executable to use based on OS
+rscript_cmd <- if (.Platform$OS.type == "windows") here::here("shrp2c16", "Rscript.bat") else "Rscript"
+log_info("Using R script command: %s", rscript_cmd)
+
 log_info("Root directory: %s", root_dir)
 log_info("Views directory: %s", views_dir)
 log_info("Report directory: %s", report_dir)
@@ -729,11 +733,11 @@ function(req, name) {
   # Run the R script as a separate process and capture output to sim.log
   
   # Create the system command to run the R script
-  cmd_args <- c(shQuote(script_path), "'-s'", shQuote(name))
+  cmd_args <- c(shQuote(script_path), "-s", shQuote(name))
   
   # Execute the command and redirect output to sim.log
   # On Mac/Linux, we can use system() with wait=FALSE to run asynchronously
-  result <- system2("Rscript", args = cmd_args, stdout = FALSE, stderr = FALSE, wait = TRUE)
+  result <- system2(rscript_cmd, args = cmd_args, stdout = FALSE, stderr = FALSE, wait = TRUE)
   #log_info(result)
 
   # Also write to stdout.txt for status monitoring
@@ -872,20 +876,20 @@ function(req) {
         tryCatch({
             # Create the system command to run the R script
             cmd_args <- c(shQuote(script_path), 
-                          "'-s'", 
+                          "-s", 
                           shQuote(scenarios_delimited),
-                          "'-p'",
+                          "-p",
                           shQuote(metric_parts[2]),
-                          "'-a'",
+                          "-a",
                           shQuote(metric_parts[1]),
-                          "'-m'",
+                          "-m",
                           shQuote(measure)
                         )
             #log_info(cmd_args)
             # Execute the command and redirect output to sim.log
             # On Mac/Linux, we can use system() with wait=FALSE to run asynchronously
-            result <- system2("Rscript", args = cmd_args, stdout = TRUE, stderr = TRUE, wait = FALSE)
-            log_info(result)
+            result <- system2(rscript_cmd, args = cmd_args, stdout = FALSE, stderr = FALSE, wait = TRUE)
+            #log_info(result)
         }, error = function(e) {
           # Generate a traceback string
           tb <- paste(capture.output(traceback()), collapse = "\n")
