@@ -596,11 +596,14 @@ function(req, res, data, name, fileName, directory = "root") {
     res$setHeader("Access-Control-Allow-Origin", "*")
     res$setHeader("Content-Type", "application/json")
     
-    # Add a custom header to trigger unblockUI in the JavaScript
+    # Add custom headers to trigger unblockUI in the JavaScript
     res$setHeader("X-UnblockUI", "true")
+    res$setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
+    res$setHeader("Pragma", "no-cache")
+    res$setHeader("Expires", "0")
     
     # Return the exact same structure as Python's return
-    return(list(success = TRUE, unblock = TRUE))
+    return(list(success = TRUE, unblock = TRUE, timestamp = as.numeric(Sys.time())))
     
   }, error = function(e) {
     log_error("Error saving CSV: %s", conditionMessage(e))
@@ -608,10 +611,15 @@ function(req, res, data, name, fileName, directory = "root") {
     # Set headers for error case
     res$setHeader("Access-Control-Allow-Origin", "*")
     res$setHeader("Content-Type", "application/json")
+    # Add headers to ensure UI unblocks even on error
+    res$setHeader("X-UnblockUI", "true")
+    res$setHeader("Cache-Control", "no-cache, no-store, must-revalidate")
+    res$setHeader("Pragma", "no-cache")
+    res$setHeader("Expires", "0")
     res$status <- 500
     
-    # Return error response
-    return(list(success = FALSE))
+    # Return error response with unblock flag
+    return(list(success = FALSE, unblock = TRUE, error = conditionMessage(e)))
   })
 }
 
